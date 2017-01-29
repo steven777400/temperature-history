@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link type="text/css" rel="stylesheet" href="site.css" />
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js'></script>
+    <script src="temperature.js"></script>
+</head>
+<body>
+    <section id="ssvg">
+        <svg width="1000" height="500" viewBox="0,0,1000,500">
+            <defs>
+                <clipPath id="clip">
+                </clipPath>
+                <linearGradient id="gradient" gradientUnits="userSpaceOnUse" x1="0" x2="0">
+                    <stop offset="0%" stop-color="lightblue" />
+                    <stop offset="20%" stop-color="cyan" />
+                    <stop offset="40%" stop-color="lightgreen" />
+                    <stop offset="60%" stop-color="yellow" />
+                    <stop offset="80%" stop-color="red" />
+                </linearGradient>
+            </defs>
+            <g id="maing">
+                <text transform="rotate(-90)" y="6" dy="0.71em" style="text-anchor: end">Temperature (&deg;F)</text>
+                <g clip-path="url(#clip)">
+                    <g id="graph"></g>
+                    <g class="focus" style="display: none">
+                        <circle r="4.5" />
+                        <text x="9" dy="0.35em" />
+                        <line x1="0" y1="-1000" x2="0" y2="1000" />
+                        <line x1="-1000" y1="0" x2="1000" y2="0" />
+                    </g>
+                </g>
+            </g>
+        </svg>
+       
+    </section>
+    <h3>
+        Mouse-wheel to zoom, drag to scroll
+    </h3>
+    <script>
+        run();
+    </script>
+</body>
+</html>

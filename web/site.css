@@ -1,0 +1,46 @@
+﻿h3 {
+    position: absolute;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    bottom: 0.5em;    
+    width: 90%;
+    left: 5%;
+    text-align: center;
+    background-color: gray;
+    border-radius: 0.5em;
+
+}
+.area {
+    fill: url(#gradient);
+    clip-path: url(#clip);
+}
+
+.line {
+    fill: none;
+    stroke: #000;
+    stroke-width: .5px;
+}
+
+.overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+text {
+    font: 10px sans-serif;
+}
+
+.focus line {
+    stroke: #000;
+    stroke-width: 0.5px;
+    opacity: 0.5;
+}
+
+.focus text {
+    font: 14px sans-serif;
+    paint-order: stroke;
+    stroke-width: 1px;
+    stroke: white;
+    fill: black;
+    border: 1px solid black;
+}
