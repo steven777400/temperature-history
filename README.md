@@ -29,3 +29,7 @@ The upload job is run daily (right after midnight), uploading the previous day's
 To visualize this data I used [D3.js](https://d3js.org/) to plot the data in an SVG chart.  
 
 The [program](web/) supports pan and zoom, automatically reads in additional daily files as needed.  The program is written in ES6 style natively, since it is primarily for personal use and I don't need to support old browser.
+
+Even with only a few days of data, interesting variations are notable.  Here's about 72 hours of temperature readings, with clear differentiation between modes of heating and even disruption from changes such as doors opening.  The Pi, being positioned nearly the floor, seems especially sensitive to blasts of cold air from outside doors opening.
+
+<img src="img/chart.png" width="500px">
