@@ -75,8 +75,9 @@ const run = () => {
 
         if (xt.domain()[0] <= x.domain()[0] && !suppressFurtherLoads) {
             suppressFurtherLoads = true;
-            let date = new Date();
-            date.setDate(xt.domain()[0].getDate() - 1);
+            const od = xt.domain()[0];
+            let date = new Date(od.getFullYear(), od.getMonth(), od.getDate());
+            date.setDate(date.getDate() - 1);
             const d0 = xt.domain()[0];
             const d1 = xt.domain()[1];
             loadDay(date)
