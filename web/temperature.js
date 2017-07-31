@@ -12,7 +12,7 @@ const resizeSVG = () => {
   
 };
 
-window.addEventListener('resize', event => {
+window.addEventListener("resize", event => {
     resizeSVG();
 });
 
@@ -20,8 +20,18 @@ const run = () => {
     let data, xt, suppressFurtherLoads = false, instFadeOut;
 
     const spinner = new Spinner();
-    if ('ontouchstart' in document.documentElement)
+    if ("ontouchstart" in document.documentElement)
         document.getElementsByTagName("h3")[0].textContent = "Pinch to zoom, drag to scroll";
+
+    const buttons = document.getElementsByClassName("showmonth");
+    Array.prototype.map.call(buttons, btn => {
+        btn.addEventListener("click", event => {
+            const months = parseInt(event.target.dataset.months);
+            const d = new Date();
+            d.setMonth(d.getMonth() - months); 
+            loadRange(d); 
+        });
+    });    
 
     const doInstFadeOut = () => {
         if (!instFadeOut)
@@ -30,12 +40,27 @@ const run = () => {
     };
 
     const setData = newdata => {
+        // update stored state
         data = newdata;
 
-        x.domain(d3.extent(data, d => d.date));
+        // If there are excessive data points, filter it out
+        const maxPts = window.screen.width;
+        let fdata;
 
-        areag.datum(data);
-        pathg.datum(data);
+        if (newdata.length > maxPts) {
+            const takeEvery = Math.round(newdata.length / maxPts);
+            fdata = newdata.filter((value, index) => {
+                return index % takeEvery === 0;
+            });
+        } else {
+            fdata = newdata;
+        }
+        
+
+        x.domain(d3.extent(fdata, d => d.date));
+
+        areag.datum(fdata);
+        pathg.datum(fdata);
     };
 
     const mousemove = () => {
@@ -59,6 +84,50 @@ const run = () => {
 
     const focusDateFormat = d => d3.timeFormat("%I:%M %p")(d);
 
+    
+    const loadRange = (fromDate) => {
+        // we include toDate optionally, used in recursion
+        // this makes sure we don't get "stuck" on a 0-byte load by making each date dependent on the previous file 
+        // rather than the data itself
+        const toDate = data[0].date;
+        const prom = new Promise((resolve, reject) => {
+            const recLoadRange = (fromDate, toDate) => {
+                if (toDate > fromDate && !suppressFurtherLoads) {
+                    suppressFurtherLoads = true;
+                    const od = toDate;
+                    let date = new Date(od.getFullYear(), od.getMonth(), od.getDate());
+                    date.setDate(date.getDate() - 1);
+                    
+                    loadDay(date)
+                        .then(newdata => {
+                            setData(newdata.concat(data));                    
+                            suppressFurtherLoads = false;
+                        })
+                        .catch(() => console.log('Date unavailable')) // catching exception here makes following then act as a finally. not going to reject whole promise
+                        .then(() => recLoadRange(fromDate, date)); // so we always recurse when we attempt a load, if it failed or if we're done, then we stop in the recursive call
+
+                } else {
+                    resolve();
+                }
+            }
+            recLoadRange(fromDate, toDate);
+        });
+
+
+        prom.then(_ => {
+            const earliestData = data[0].date;
+            const d0 = new Date(Math.max(fromDate, earliestData));
+            const d1 = new Date();
+            svg.call(zoom)
+                .call(zoom.transform, d3.zoomIdentity
+                    .scale(width / (x(d1) - x(d0)))
+                    .translate(-x(d0), 0));
+            suppressFurtherLoads = false;
+
+        });
+            
+
+    };
 
     const zoomed = () => {        
         focus.style("display", "none");
@@ -88,7 +157,8 @@ const run = () => {
                             .scale(width / (x(d1) - x(d0)))
                             .translate(-x(d0), 0));
                     suppressFurtherLoads = false;
-                });
+                })
+                .catch(() => console.log('Date unavailable'));
 
         }
     };
@@ -101,7 +171,7 @@ const run = () => {
             const begin = new Date(day.getFullYear(), day.getMonth(), day.getDate());
             let delta = 0, localdata = [];
             const oReq = new XMLHttpRequest();
-            oReq.open("GET", "data/" + d3.timeFormat("%Y%m%d")(begin) + ".bin", true);
+            oReq.open("GET", `data/${d3.timeFormat("%Y%m%d")(begin)}.bin`, true);
             oReq.responseType = "arraybuffer";
 
             oReq.onload = oEvent => {
@@ -138,7 +208,9 @@ const run = () => {
                 });
             };
 
+            
             oReq.send(null);
+            
         });
 
 
